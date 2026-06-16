@@ -13,6 +13,7 @@ O projeto foi construído utilizando as seguintes tecnologias e bibliotecas:
 - **Zod:** Validação e parsing de esquemas de dados de entrada.
 - **Bcrypt:** Hashing de senhas.
 - **JsonWebToken (JWT):** Autenticação stateless e controle de permissões por roles.
+- **Vitest & Supertest:** Implementação de testes automatizados de unidade e integração.
 
 ### 🔮 Futuras Implementações
 
@@ -68,4 +69,8 @@ O projeto adota o padrão **Controller-Service** para separação de responsabil
 4. Inicie o servidor de desenvolvimento:
    ```bash
    npm run dev
+   ```
+5. Execute a suíte de testes automatizados:
+   ```bash
+   npm run test
    ```
