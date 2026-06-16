@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum FuncaoUsuario {
+  ADMIN
+  USER
+  BIBLIOTECARIO
+}
+
+model User {
+  id             String        @id @default(uuid())
+  nome           String
+  email          String        @unique
+  senha          String
+  createdAt      DateTime      @default(now())
+  editedAt       DateTime      @updatedAt
+  dataNascimento DateTime?
+  avatarUrl      String?
+  Livros         Livro[]
+  funcao         FuncaoUsuario @default(USER)
+  emprestimos    Emprestimo[]
+  reservas       Reserva[]
+
+  @@index([email])
+}
+
+model Livro {
+  id            String       @id @default(uuid())
+  titulo        String       @unique
+  anoPublicacao DateTime     @default(now())
+  autorId       String
+  autor         Autor        @relation(fields: [autorId], references: [id])
+  user          User?        @relation(fields: [userId], references: [id])
+  userId        String?
+  createdAt     DateTime     @default(now())
+  editedAt      DateTime     @updatedAt
+  capaUrl       String
+  sinopse       String
+  genero        String
+  editora       String
+  numeroEdicao  String
+  quantidade    Int
+  emprestimos   Emprestimo[]
+  reservas      Reserva[]
+
+  @@index([titulo])
+}
+
+model Autor {
+  id     String  @id @default(uuid())
+  nome   String
+  livros Livro[]
+}
+
+model Emprestimo {
+  id             String    @id @default(uuid())
+  livro          Livro     @relation(fields: [livroId], references: [id])
+  livroId        String
+  user           User      @relation(fields: [userId], references: [id])
+  userId         String
+  dataEmprestimo DateTime  @default(now())
+  dataDevolucao  DateTime?
+}
+
+model Reserva {
+  id            String    @id @default(uuid())
+  livro         Livro     @relation(fields: [livroId], references: [id])
+  livroId       String
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  dataReserva   DateTime  @default(now())
+  dataDevolucao DateTime?
+}
