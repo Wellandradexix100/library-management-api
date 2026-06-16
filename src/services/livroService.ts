@@ -13,7 +13,13 @@ export const createLivroService = async (titulo: string, autorId: string, anoPub
         data: {
             titulo,
             autorId,
-            anoPublicacao
+            anoPublicacao,
+            capaUrl: "",
+            sinopse: "",
+            genero: "",
+            editora: "",
+            numeroEdicao: "",
+            quantidade: 1
         }
     });
 

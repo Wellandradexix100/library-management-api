@@ -7,8 +7,8 @@
   "type": "commonjs",
   "main": "src/app.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec tsx src/app.ts"
+    "test": "vitest",
+    "dev": "nodemon --exec tsx src/server.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -29,8 +29,11 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.9.3",
+    "@types/supertest": "^7.2.0",
+    "supertest": "^7.2.2",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   },
   "allowScripts": {
     "@prisma/engines@7.8.0": true,

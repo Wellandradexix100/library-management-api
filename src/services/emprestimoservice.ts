@@ -10,14 +10,14 @@ export const createEmprestimoService = async (livroId: string, usuarioId: string
     if (!livro) {
         throw new Error('Livro não encontrado')
     }
-    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId } })
+    const usuario = await prisma.user.findUnique({ where: { id: usuarioId } })
     if (!usuario) {
         throw new Error('Usuário não encontrado')
     }
     const emprestimo = await prisma.emprestimo.create({
         data: {
             livroId,
-            usuarioId
+            userId: usuarioId
         }
     })
     return emprestimo
