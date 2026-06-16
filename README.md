@@ -18,6 +18,8 @@ O projeto foi construído utilizando as seguintes tecnologias e bibliotecas:
 ### 🔮 Futuras Implementações
 
 Para as próximas atualizações, o projeto integrará:
+- **Sistema de Reservas e Filas de Espera:** Implementação de uma lógica de fila para exemplares indisponíveis, permitindo que usuários reservem livros e sejam notificados da disponibilidade.
+- **Fluxo de Devolução de Livros:** Criação de rotas dedicadas para o encerramento do empréstimo (devolução), com atualização de status de disponibilidade do acervo e cálculo de eventuais multas por atraso.
 - **Helmet:** Proteção de cabeçalhos HTTP contra vulnerabilidades comuns (XSS, etc).
 - **Express-Rate-Limit:** Prevenção contra ataques de força bruta (DDoS) limitando requisições em rotas públicas.
 
