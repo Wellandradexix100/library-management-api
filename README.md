@@ -18,18 +18,16 @@ O projeto foi construído utilizando as seguintes tecnologias e bibliotecas:
 ### 🔮 Futuras Implementações
 
 Para as próximas atualizações, o projeto integrará:
-- **Sistema de Reservas e Filas de Espera:** Implementação de uma lógica de fila para exemplares indisponíveis, permitindo que usuários reservem livros e sejam notificados da disponibilidade.
-- **Fluxo de Devolução de Livros:** Criação de rotas dedicadas para o encerramento do empréstimo (devolução), com atualização de status de disponibilidade do acervo e cálculo de eventuais multas por atraso.
 - **Helmet:** Proteção de cabeçalhos HTTP contra vulnerabilidades comuns (XSS, etc).
 - **Express-Rate-Limit:** Prevenção contra ataques de força bruta (DDoS) limitando requisições em rotas públicas.
 
 ## 📂 Arquitetura
 
-O projeto adota o padrão **Controller-Service** para separação de responsabilidades:
+O projeto adota o padrão **Controller-Service** para separação de responsabilidades e conta com **Tratamento Global de Erros**:
 - **Rotas:** Definem os endpoints.
-- **Middlewares:** Validam tokens e níveis de acesso (Admin).
-- **Controllers:** Lidam estritamente com as requisições e respostas HTTP.
-- **Services:** Concentram a regra de negócio e consultas ao banco de dados.
+- **Middlewares:** Validam tokens, níveis de acesso (Admin) e interceptam erros globalmente (`ErrorHandler`).
+- **Controllers:** Lidam estritamente com as requisições e respostas HTTP (sem blocos `try/catch`, repassando erros nativamente pelo Express 5).
+- **Services:** Concentram a regra de negócio, consultas ao banco de dados e controle de estoque, lançando exceções customizadas (`AppError`).
 
 ## 🔗 Endpoints Principais
 
@@ -50,7 +48,14 @@ O projeto adota o padrão **Controller-Service** para separação de responsabil
 
 ### Empréstimos (`/api`)
 - `GET /emprestimo` - Lista todos os empréstimos.
-- `POST /emprestimo` - Registra um novo empréstimo vinculando um usuário a um livro físico.
+- `POST /emprestimo` - Registra um novo empréstimo vinculando um usuário a um livro físico (abate do estoque).
+- `PUT /emprestimo/:id` - Devolve o empréstimo (retorna o livro ao estoque).
+
+### Reservas (`/api`)
+- `GET /reservas` - Lista todas as reservas.
+- `POST /reservas` - Cria uma reserva (abate do estoque).
+- `DELETE /reservas/:id/cancelar` - Cancela a reserva (retorna o livro ao estoque).
+- `POST /reservas/:id/efetivar` - Efetiva a reserva transformando-a em empréstimo.
 
 ## 🛠 Como Executar o Projeto Localmente
 

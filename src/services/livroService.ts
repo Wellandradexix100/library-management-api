@@ -5,7 +5,7 @@ export const getLivrosService = async () => {
     return await prisma.livro.findMany();
 }
 
-export const createLivroService = async (titulo: string, autorId: string, anoPublicacao: any) => {
+export const createLivroService = async (titulo: string, autorId: string, anoPublicacao: any, quantidade: number = 1) => {
     if (!titulo || !autorId) {
         throw new AppError("Livro inválido", 400);
     }
@@ -20,7 +20,7 @@ export const createLivroService = async (titulo: string, autorId: string, anoPub
             genero: "",
             editora: "",
             numeroEdicao: "",
-            quantidade: 1
+            quantidade
         }
     });
 

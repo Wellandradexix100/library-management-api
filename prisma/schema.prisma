@@ -81,5 +81,5 @@ model Reserva {
   user          User      @relation(fields: [userId], references: [id])
   userId        String
   dataReserva   DateTime  @default(now())
-  dataDevolucao DateTime?
+  dataExpiracao DateTime?
 }

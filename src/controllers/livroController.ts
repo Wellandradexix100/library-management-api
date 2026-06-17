@@ -7,8 +7,8 @@ export const todosLivros = async (req: Request, res: Response) => {
 }
 
 export const adicionarLivro = async (req: Request, res: Response) => {
-    const { titulo, autorId, anoPublicacao } = req.body;
-    const livro = await createLivroService(titulo, autorId, anoPublicacao);
+    const { titulo, autorId, anoPublicacao, quantidade } = req.body;
+    const livro = await createLivroService(titulo, autorId, anoPublicacao, quantidade);
     res.status(201).json(livro);
 }
 

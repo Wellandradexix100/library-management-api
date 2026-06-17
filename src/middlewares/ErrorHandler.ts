@@ -16,7 +16,6 @@ export const ErrorHandler = (error: Error, req: Request, res: Response, next: Ne
         });
     }
 
-    // Ocultar o stack trace em produção para segurança, mas logar no console
     console.error(error);
 
     return res.status(500).json({

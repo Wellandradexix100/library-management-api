@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import app from '../app';
+import { prisma } from '../../lib/prisma';
+import bcrypt from 'bcrypt';
 
 describe('Testes de Integração E2E (Fluxo Completo)', () => {
     let userToken = '';
@@ -86,7 +88,20 @@ describe('Testes de Integração E2E (Fluxo Completo)', () => {
         (global as any).emprestimoId = response.body.id;
     });
 
-    it('6. deve devolver o empréstimo criado', async () => {
+    it('5.1 NÃO deve permitir um segundo empréstimo pois o estoque acabou', async () => {
+        const response = await request(app)
+            .post('/api/emprestimo')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({
+                livroId: livroId,
+                usuarioId: userId
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toBe('Livro indisponível para empréstimo ou reserva');
+    });
+
+    it('6. deve devolver o empréstimo criado (estoque volta a 1)', async () => {
         const empId = (global as any).emprestimoId;
         const response = await request(app)
             .put(`/api/emprestimo/${empId}`)
@@ -96,5 +111,68 @@ describe('Testes de Integração E2E (Fluxo Completo)', () => {
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('dataDevolucao');
         expect(response.body.dataDevolucao).not.toBeNull();
+    });
+
+    it('7. deve criar uma reserva com sucesso', async () => {
+        const dataExpiracao = new Date();
+        dataExpiracao.setDate(dataExpiracao.getDate() + 2);
+
+        const response = await request(app)
+            .post('/api/reservas')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({
+                livroId,
+                usuarioId: userId,
+                dataExpiracao: dataExpiracao.toISOString()
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty('id');
+        (global as any).reservaId = response.body.id;
+    });
+
+    it('8. NÃO deve permitir empréstimo do livro reservado (estoque 0)', async () => {
+        const response = await request(app)
+            .post('/api/emprestimo')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({
+                livroId,
+                usuarioId: userId
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body.message).toBe('Livro indisponível para empréstimo ou reserva');
+    });
+
+    it('9. ADMIN deve poder efetivar a reserva em um empréstimo', async () => {
+        const adminEmail = `admin_reserva_${randomSuffix}@teste.com`;
+        const hashedPassword = await bcrypt.hash('senhaadmin', 10);
+        await prisma.user.create({
+            data: {
+                nome: 'Admin Reserva',
+                email: adminEmail,
+                senha: hashedPassword,
+                funcao: 'ADMIN'
+            }
+        });
+
+        const adminLoginRes = await request(app)
+            .post('/api/login')
+            .send({ email: adminEmail, password: 'senhaadmin' });
+
+        const adminToken = adminLoginRes.body.token;
+
+        const resId = (global as any).reservaId;
+        const response = await request(app)
+            .post(`/api/reservas/${resId}/efetivar`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({
+                previstaDevolucao: new Date().toISOString()
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toHaveProperty('id');
+        expect(response.body.livroId).toBe(livroId);
+        expect(response.body.userId).toBe(userId);
     });
 });
