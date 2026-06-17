@@ -46,6 +46,7 @@ describe('Testes de Integração E2E (Fluxo Completo)', () => {
     it('3. deve criar um autor com sucesso', async () => {
         const response = await request(app)
             .post('/api/autor')
+            .set('Authorization', `Bearer ${userToken}`)
             .send({ nome: `Dan Brown ${randomSuffix}` });
 
         expect(response.status).toBe(201);
@@ -56,6 +57,7 @@ describe('Testes de Integração E2E (Fluxo Completo)', () => {
     it('4. deve criar um livro vinculando o autor recém-criado', async () => {
         const response = await request(app)
             .post('/api/livros')
+            .set('Authorization', `Bearer ${userToken}`)
             .send({
                 titulo: livroTitulo,
                 autorId: autorId,
@@ -70,6 +72,7 @@ describe('Testes de Integração E2E (Fluxo Completo)', () => {
     it('5. deve criar um empréstimo vinculando o usuário e o livro', async () => {
         const response = await request(app)
             .post('/api/emprestimo')
+            .set('Authorization', `Bearer ${userToken}`)
             .send({
                 livroId: livroId,
                 usuarioId: userId
@@ -79,5 +82,19 @@ describe('Testes de Integração E2E (Fluxo Completo)', () => {
         expect(response.body).toHaveProperty('id');
         expect(response.body.livroId).toBe(livroId);
         expect(response.body.userId).toBe(userId);
+
+        (global as any).emprestimoId = response.body.id;
+    });
+
+    it('6. deve devolver o empréstimo criado', async () => {
+        const empId = (global as any).emprestimoId;
+        const response = await request(app)
+            .put(`/api/emprestimo/${empId}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send();
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('dataDevolucao');
+        expect(response.body.dataDevolucao).not.toBeNull();
     });
 });

@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../errors/AppError";
 
 export const isAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (req.user.funcao !== "ADMIN") {
-        return res.status(403).json({ message: "Apenas administradores podem criar outros administradores" });
+        throw new AppError("Apenas administradores podem criar outros administradores", 403);
     }
     next();
 };

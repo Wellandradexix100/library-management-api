@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../errors/AppError";
 
 export const getAutoresService = async () => {
     return await prisma.autor.findMany({
@@ -17,7 +18,7 @@ export const getAutoresService = async () => {
 
 export const createAutorService = async (nome: string) => {
     if (!nome) {
-        throw new Error("Nome do autor inválido");
+        throw new AppError("Nome do autor inválido", 400);
     }
 
     const autor = await prisma.autor.create({
@@ -33,7 +34,7 @@ export const deleteAutorService = async (id: string) => {
     const autor = await prisma.autor.findUnique({ where: { id } });
     
     if (!autor) {
-        throw new Error("Autor não encontrado");
+        throw new AppError("Autor não encontrado", 404);
     }
 
     await prisma.autor.delete({ where: { id } });

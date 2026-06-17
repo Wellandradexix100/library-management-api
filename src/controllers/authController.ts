@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { loginService, registerService, createAdminService } from "../services/authService";
+import { loginService, registerService, createAdminService, todosUsuariosService } from "../services/authService";
 
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -18,3 +18,8 @@ export const createAdmin = async (req: Request, res: Response) => {
     const user = await createAdminService(nome, email, password);
     res.status(201).json(user);
 };
+
+export const todosUsuarios = async (req: Request, res: Response) => {
+    const users = await todosUsuariosService()
+    res.status(200).json(users)
+}

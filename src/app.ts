@@ -14,9 +14,13 @@ app.get('/', (req, res) => {
     res.send('Estamos a todo vapor 🚅')
 })
 
+import { ErrorHandler } from './middlewares/ErrorHandler'
+
 app.use('/api', livroRoutes)
 app.use('/api', autorRoutes)
 app.use('/api', emprestimoRoutes)
 app.use('/api', authRoutes)
+
+app.use(ErrorHandler)
 
 export default app;

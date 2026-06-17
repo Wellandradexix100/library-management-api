@@ -2,6 +2,7 @@ import { prisma } from "../../lib/prisma";
 import z from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { AppError } from "../errors/AppError";
 
 const loginSchema = z.object({
     email: z.string().email(),
@@ -25,7 +26,7 @@ export async function loginService(email: string, password: string) {
     const user = await prisma.user.findUnique({ where: { email: validEmail } });
 
     if (!user) {
-        throw new Error("Usuário não encontrado");
+        throw new AppError("Usuário não encontrado", 404);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -34,7 +35,7 @@ export async function loginService(email: string, password: string) {
     );
 
     if (!isPasswordValid) {
-        throw new Error("Senha inválida");
+        throw new AppError("Senha inválida", 401);
     }
 
     const token = jwt.sign(
@@ -58,7 +59,7 @@ export async function registerService(nome: string, email: string, password: str
 
     const existingUser = await prisma.user.findUnique({ where: { email: validEmail } });
     if (existingUser) {
-        throw new Error("Email já cadastrado");
+        throw new AppError("Email já cadastrado", 400);
     }
 
     const hashedPassword = await bcrypt.hash(validPassword, 10);
@@ -98,7 +99,7 @@ export const createAdminService = async (nome: string, email: string, password: 
 
     const existingUser = await prisma.user.findUnique({ where: { email: validEmail } });
     if (existingUser) {
-        throw new Error("Email já cadastrado");
+        throw new AppError("Email já cadastrado", 400);
     }
 
     const hashedPassword = await bcrypt.hash(validPassword, 10);
@@ -128,4 +129,16 @@ export const createAdminService = async (nome: string, email: string, password: 
         user,
         token,
     };
+}
+
+export const todosUsuariosService = async () => {
+    const users = await prisma.user.findMany({
+        select: {
+            id: true,
+            email: true,
+            nome: true,
+            funcao: true
+        }
+    })
+    return users
 }
